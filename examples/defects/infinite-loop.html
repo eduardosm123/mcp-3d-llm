@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /><title>Defect: blocks the main thread forever</title><style>body{margin:0}</style></head>
+<body>
+  <canvas id="c" width="800" height="600"></canvas>
+  <script>
+    const ctx = document.getElementById("c").getContext("2d");
+    ctx.fillStyle = "#234";
+    ctx.fillRect(0, 0, 800, 600);
+    while (true) { /* wedged */ }
+  </script>
+</body>
+</html>

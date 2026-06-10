@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>House — Canvas 2D (C3D) example</title>
+  <style> body { margin: 0; } </style>
+</head>
+<body>
+  <canvas id="c" width="800" height="600"></canvas>
+  <script src="/__helpers/canvas3d.js"></script>
+  <script src="/__helpers/texture-helpers.js"></script>
+  <script>
+    const s = C3D.scene(document.getElementById("c"), { background: "#1c2438" });
+
+    // ground slab
+    C3D.box({ w: 5, h: 0.15, d: 4.5 }).at(0, -0.075, 0).color("#3a4a3a").addTo(s);
+
+    // walls (split so painter's sorting behaves)
+    C3D.box({ w: 2.6, h: 1.6, d: 2.2 }).at(0, 0.8, 0).color("#c8b89a").texture(TEX.brick({ rows: 6 }), { scale: 0.25 }).addTo(s);
+
+    // roof
+    C3D.extrude([[-1.55, 0], [1.55, 0], [0, 1.0]], 2.6).at(0, 1.6, 0).rotate(0, 0, 0).color("#8a3c2c").addTo(s);
+
+    // door + windows
+    C3D.box({ w: 0.5, h: 0.9, d: 0.06 }).at(0, 0.45, 1.13).color("#5a3a22").texture(TEX.wood(), { scale: 0.2 }).addTo(s);
+    C3D.box({ w: 0.45, h: 0.45, d: 0.06 }).at(-0.8, 0.95, 1.13).color("#9fd0e8").addTo(s);
+    C3D.box({ w: 0.45, h: 0.45, d: 0.06 }).at(0.8, 0.95, 1.13).color("#9fd0e8").addTo(s);
+
+    // chimney
+    C3D.box({ w: 0.3, h: 0.8, d: 0.3 }).at(0.8, 2.3, -0.4).color("#7a4a3a").addTo(s);
+
+    // tree: trunk + canopy
+    C3D.cylinder({ r: 0.12, h: 0.8, segments: 10 }).at(-2.2, 0.4, 0.6).color("#5a3a22").addTo(s);
+    C3D.sphere({ r: 0.55, segments: 14, rings: 10 }).at(-2.2, 1.1, 0.6).color("#3f7a3f").addTo(s);
+
+    s.light({ dir: [-0.4, -1, -0.7], ambient: 0.4 });
+    s.camera({ azimuth_deg: 30, elevation_deg: 22 });
+    s.render();
+  </script>
+</body>
+</html>

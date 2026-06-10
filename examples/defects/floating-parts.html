@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" /><title>Defect: part hovering in mid-air</title>
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.module.js" } }
+  </script>
+  <style>body{margin:0}</style>
+</head>
+<body>
+  <canvas id="c" width="800" height="600"></canvas>
+  <script type="module">
+    import * as THREE from "three";
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("c") });
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x252535);
+    const camera = new THREE.PerspectiveCamera(50, 800 / 600, 0.1, 100);
+    camera.position.set(3, 2.5, 4);
+    camera.lookAt(0, 1, 0);
+
+    const ground = new THREE.Mesh(
+      new THREE.BoxGeometry(6, 0.1, 6),
+      new THREE.MeshStandardMaterial({ color: 0x404050 })
+    );
+    ground.name = "ground";
+    ground.position.y = -0.05;
+    scene.add(ground);
+
+    const base = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 0x4477aa }));
+    base.name = "base";
+    base.position.y = 0.5;
+    scene.add(base);
+
+    // the bug: this sphere floats 1.5 units above the base, touching nothing
+    const floater = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 12), new THREE.MeshStandardMaterial({ color: 0xcc8844 }));
+    floater.name = "floater";
+    floater.position.y = 2.8;
+    scene.add(floater);
+
+    scene.add(new THREE.DirectionalLight(0xffffff, 2));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+    renderer.render(scene, camera);
+    window.__scene = { scene, camera, renderer };
+  </script>
+</body>
+</html>

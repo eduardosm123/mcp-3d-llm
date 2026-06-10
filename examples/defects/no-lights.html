@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" /><title>Defect: lit materials, zero lights</title>
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.module.js" } }
+  </script>
+  <style>body{margin:0}</style>
+</head>
+<body>
+  <canvas id="c" width="800" height="600"></canvas>
+  <script type="module">
+    import * as THREE from "three";
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("c") });
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x303040);
+    const camera = new THREE.PerspectiveCamera(50, 800 / 600, 0.1, 100);
+    camera.position.set(2, 2, 3);
+    camera.lookAt(0, 0, 0);
+    scene.add(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 0xcc4444 })));
+    renderer.render(scene, camera);
+    window.__scene = { scene, camera, renderer };
+  </script>
+</body>
+</html>

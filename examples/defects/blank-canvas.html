@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /><title>Defect: renders nothing</title><style>body{margin:0}</style></head>
+<body>
+  <canvas id="c" width="800" height="600"></canvas>
+  <script>
+    // Creates a context, paints a flat background and... nothing else.
+    const ctx = document.getElementById("c").getContext("2d");
+    ctx.fillStyle = "#222222";
+    ctx.fillRect(0, 0, 800, 600);
+  </script>
+</body>
+</html>

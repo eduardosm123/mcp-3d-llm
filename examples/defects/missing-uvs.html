@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" /><title>Defect: texture on geometry without UVs</title>
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.module.js" } }
+  </script>
+  <style>body{margin:0}</style>
+</head>
+<body>
+  <canvas id="c" width="800" height="600"></canvas>
+  <script src="/__helpers/texture-helpers.js"></script>
+  <script type="module">
+    import * as THREE from "three";
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("c") });
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x252535);
+    const camera = new THREE.PerspectiveCamera(50, 800 / 600, 0.1, 100);
+    camera.position.set(2, 2, 3);
+    camera.lookAt(0, 0.5, 0);
+
+    // custom BufferGeometry: positions + normals, but NO uv attribute
+    const geo = new THREE.BufferGeometry();
+    const verts = new Float32Array([
+      -0.5, 0, 0.5,  0.5, 0, 0.5,  0.5, 1, 0.5,  -0.5, 0, 0.5,  0.5, 1, 0.5,  -0.5, 1, 0.5,
+    ]);
+    geo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
+    geo.computeVertexNormals();
+
+    const tex = new THREE.CanvasTexture(TEX.brick());
+    const wall = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: tex, side: THREE.DoubleSide }));
+    wall.name = "uvless_wall";
+    scene.add(wall);
+
+    scene.add(new THREE.DirectionalLight(0xffffff, 2));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+    renderer.render(scene, camera);
+    window.__scene = { scene, camera, renderer };
+  </script>
+</body>
+</html>

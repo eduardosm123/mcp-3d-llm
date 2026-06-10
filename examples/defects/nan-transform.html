@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" /><title>Defect: NaN position</title>
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.module.js" } }
+  </script>
+  <style>body{margin:0}</style>
+</head>
+<body>
+  <canvas id="c" width="800" height="600"></canvas>
+  <script type="module">
+    import * as THREE from "three";
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("c") });
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x252535);
+    const camera = new THREE.PerspectiveCamera(50, 800 / 600, 0.1, 100);
+    camera.position.set(2, 2, 3);
+    camera.lookAt(0, 0, 0);
+
+    const ok = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 0x44aa66 }));
+    ok.name = "ok_box";
+    scene.add(ok);
+
+    const broken = new THREE.Mesh(new THREE.SphereGeometry(0.4, 12, 8), new THREE.MeshStandardMaterial({ color: 0xaa4444 }));
+    broken.name = "broken_sphere";
+    const divisor = 0; // oops
+    broken.position.x = 1 / divisor - 1 / divisor; // NaN
+    scene.add(broken);
+
+    scene.add(new THREE.DirectionalLight(0xffffff, 2));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+    renderer.render(scene, camera);
+    window.__scene = { scene, camera, renderer };
+  </script>
+</body>
+</html>

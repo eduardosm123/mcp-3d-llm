@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Robot — Three.js example</title>
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.module.js" } }
+  </script>
+  <style> body { margin: 0; } </style>
+</head>
+<body>
+  <canvas id="scene" width="800" height="600"></canvas>
+  <script type="module">
+    import * as THREE from "three";
+
+    const canvas = document.getElementById("scene");
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x232336);
+    const camera = new THREE.PerspectiveCamera(50, 800 / 600, 0.1, 100);
+    camera.position.set(3, 2.5, 5);
+    camera.lookAt(0, 1, 0);
+
+    const body = new THREE.Mesh(
+      new THREE.BoxGeometry(1.2, 1.6, 0.7),
+      new THREE.MeshStandardMaterial({ color: 0x5588cc, roughness: 0.6 })
+    );
+    body.position.y = 1.4;
+    scene.add(body);
+
+    const head = new THREE.Mesh(
+      new THREE.BoxGeometry(0.7, 0.6, 0.6),
+      new THREE.MeshStandardMaterial({ color: 0x88aadd, roughness: 0.5 })
+    );
+    head.position.y = 2.5;
+    scene.add(head);
+
+    const eyeGeo = new THREE.SphereGeometry(0.08, 12, 8);
+    const eyeMat = new THREE.MeshStandardMaterial({ color: 0xffee44, emissive: 0x886600 });
+    for (const side of [-1, 1]) {
+      const eye = new THREE.Mesh(eyeGeo, eyeMat);
+      eye.position.set(side * 0.18, 2.55, 0.31);
+      scene.add(eye);
+    }
+
+    const limbMat = new THREE.MeshStandardMaterial({ color: 0x445577, roughness: 0.7 });
+    for (const side of [-1, 1]) {
+      const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 1.1, 12), limbMat);
+      arm.position.set(side * 0.78, 1.5, 0);
+      scene.add(arm);
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 1.2, 12), limbMat);
+      leg.position.set(side * 0.32, 0.6, 0);
+      scene.add(leg);
+    }
+
+    const ground = new THREE.Mesh(
+      new THREE.CylinderGeometry(3, 3, 0.1, 32),
+      new THREE.MeshStandardMaterial({ color: 0x333344, roughness: 0.9 })
+    );
+    ground.position.y = -0.05;
+    scene.add(ground);
+
+    const sun = new THREE.DirectionalLight(0xffffff, 2.2);
+    sun.position.set(4, 6, 3);
+    scene.add(sun);
+    scene.add(new THREE.AmbientLight(0x8899bb, 0.6));
+
+    renderer.render(scene, camera);
+    window.__scene = { scene, camera, renderer };
+  </script>
+</body>
+</html>
