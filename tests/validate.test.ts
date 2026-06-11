@@ -67,6 +67,12 @@ describe("validate_scene on defect examples", () => {
     expect(ids(report)).toContain("MISSING_UVS");
   });
 
+  it("detects smooth/off-grid drawing in pixel art", async () => {
+    const { report } = await validateScene({ ...DEFAULTS, file_path: example("defects/pixelart-blurry.html") });
+    expect(ids(report)).toContain("ANTI_ALIASING");
+    expect(ids(report)).toContain("PALETTE_OVERFLOW");
+  });
+
   it("survives an infinite loop within the hard timeout", async () => {
     const start = Date.now();
     const timeout = 8000;
@@ -91,6 +97,23 @@ describe("validate_scene on good examples", () => {
     const { report } = await validateScene({ ...DEFAULTS, file_path: example("good-canvas2d-house.html") });
     expect(report.engine).toBe("canvas2d");
     expect(report.ok).toBe(true);
+    const image = report.image as Record<string, unknown>;
+    expect(image.blank).toBe(false);
+  });
+
+  it("pixel art slime: ok, pixel checks clean, grid stats reported", async () => {
+    const { report } = await validateScene({ ...DEFAULTS, file_path: example("good-pixelart-slime.html") });
+    expect(report.ok).toBe(true);
+    expect(report.mode).toBe("2d");
+    expect(ids(report)).not.toContain("ANTI_ALIASING");
+    const pixel = report.pixel_art as Record<string, unknown>;
+    expect((pixel.grid as Record<string, number>).width).toBe(32);
+  });
+
+  it("2d illustration scene: ok, mode 2d", async () => {
+    const { report } = await validateScene({ ...DEFAULTS, file_path: example("good-2d-scene.html") });
+    expect(report.ok).toBe(true);
+    expect(report.mode).toBe("2d");
     const image = report.image as Record<string, unknown>;
     expect(image.blank).toBe(false);
   });

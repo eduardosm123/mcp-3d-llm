@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /><title>Defect: pixel art ruined by smooth drawing</title><style>body{margin:0}</style></head>
+<body>
+  <canvas id="c"></canvas>
+  <script src="/__helpers/pixel-helpers.js"></script>
+  <script>
+    const p = PIX.create(document.getElementById("c"), {
+      width: 16, height: 16, scale: 16,
+      palette: PIX.palettes.gameboy,
+      background: 0,
+    });
+    p.rectFill(4, 4, 8, 8, 2);
+
+    // the bug: drawing smooth, off-grid shapes DIRECTLY on the display canvas
+    const ctx = document.getElementById("c").getContext("2d");
+    const drawSmoothBlob = () => {
+      ctx.beginPath();
+      ctx.arc(128, 128, 70, 0, Math.PI * 2);
+      const grad = ctx.createRadialGradient(128, 128, 10, 128, 128, 70);
+      grad.addColorStop(0, "#ff8844");
+      grad.addColorStop(1, "#4488ff");
+      ctx.fillStyle = grad;
+      ctx.fill();
+    };
+    p.show();
+    drawSmoothBlob();
+    window.__redraw = () => { p.show(); drawSmoothBlob(); };
+  </script>
+</body>
+</html>

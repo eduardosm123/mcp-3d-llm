@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /><title>Slime — pixel art (PIX) example</title><style>body{margin:0}</style></head>
+<body>
+  <canvas id="c"></canvas>
+  <script src="/__helpers/pixel-helpers.js"></script>
+  <script>
+    // transparent background (checkerboard) — sprite-sheet style presentation,
+    // and it lets outline() see the sprite's edges
+    const p = PIX.create(document.getElementById("c"), {
+      width: 32, height: 32, scale: 12,
+      palette: PIX.palettes.sweetie16,
+    });
+
+    // two-frame idle animation: squash & stretch
+    function drawSlime(p, squash) {
+      // ground line
+      p.rectFill(2, 27, 28, 2, 15);
+      p.dither(2, 29, 28, 2, 15, 0, { pattern: "checker" });
+
+      const top = 12 + squash;        // body rises/falls 1px
+      const h = 15 - squash;
+      // body: green ramp 5 (light) / 6 (mid) / 7 (dark)
+      p.circleFill(16, top + Math.floor(h / 2), Math.floor(h / 2) + 5, 6);
+      p.rectFill(6, top + Math.floor(h / 2), 21, Math.ceil(h / 2) + 1, 6);
+      // belly shadow + top highlight (one light source, top-left)
+      p.rectFill(8, 25 - squash, 17, 2, 7);
+      p.circleFill(12, top + 3, 3, 5);
+      p.px(10, top + 2, 12);
+      // eyes + mouth
+      p.rectFill(11, top + 6, 2, 3, 0);
+      p.rectFill(19, top + 6, 2, 3, 0);
+      p.px(11, top + 6, 12);
+      p.px(19, top + 6, 12);
+      p.line(14, top + 11, 17, top + 11, 0);
+      // drip highlight
+      p.px(24, top + 4, 5);
+      p.outline(0);
+    }
+
+    p.animate([
+      (p) => drawSlime(p, 0),
+      (p) => drawSlime(p, 1),
+    ], { fps: 4 });
+  </script>
+</body>
+</html>

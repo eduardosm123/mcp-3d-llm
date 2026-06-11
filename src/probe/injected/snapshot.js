@@ -24,5 +24,17 @@
     canvases: p.canvases,
     contextCreationErrors: p.contextCreationErrors,
     contextLost: p.contextLost,
+    // 2D conventions: declared flat-2D scenes skip multi-view advice;
+    // __pix metadata unlocks pixel-art validation.
+    mode: typeof window.__mode === "string" ? window.__mode : null,
+    pix:
+      window.__pix && typeof window.__pix.width === "number"
+        ? {
+            width: window.__pix.width,
+            height: window.__pix.height,
+            scale: window.__pix.scale || 1,
+            palette_size: window.__pix.palette_size || 0,
+          }
+        : null,
   };
 })

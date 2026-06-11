@@ -81,6 +81,13 @@ export interface CanvasInfo {
   height: number;
 }
 
+export interface PixInfo {
+  width: number;
+  height: number;
+  scale: number;
+  palette_size: number;
+}
+
 export interface ProbeSnapshot {
   engine: Engine;
   deep: boolean;
@@ -90,6 +97,10 @@ export interface ProbeSnapshot {
   canvases: CanvasInfo[];
   contextCreationErrors: string[];
   contextLost: boolean;
+  /** Declared by the page (window.__mode = "2d") — flat scene, no orbiting. */
+  mode: string | null;
+  /** Pixel-art grid metadata (window.__pix) — unlocks pixel-art validation. */
+  pix: PixInfo | null;
 }
 
 export interface PageLog {

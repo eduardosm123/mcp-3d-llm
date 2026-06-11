@@ -2,6 +2,7 @@ import { z } from "zod";
 import { withScene, captureCanvas } from "../browser/session.js";
 import { callInjected } from "../probe/loader.js";
 import { analyzeImage, type ImageStats } from "../analysis/image.js";
+import { analyzePixelArt, type PixelArtStats } from "../analysis/pixelart.js";
 import { pageIssues, imageIssues, sortIssues } from "../analysis/report.js";
 import { renderOptionsShape } from "./render.js";
 import type { Issue, RenderOptions } from "../types.js";
@@ -52,11 +53,17 @@ export async function validateScene(args: ValidateArgs): Promise<ValidateResult>
     // render-once WebGL scene isn't captured blank).
     await session.page.evaluate(callInjected("redraw.js")).catch(() => {});
     let stats: ImageStats | null = null;
+    let pixelStats: PixelArtStats | undefined;
     let shot: { buffer: Buffer; target: "canvas" | "page" } | null = null;
     try {
       shot = await captureCanvas(session, opts);
       stats = analyzeImage(shot.buffer);
       issues.push(...imageIssues(stats, snapshot));
+      if (snapshot.pix && shot.target === "canvas") {
+        const pixelArt = analyzePixelArt(shot.buffer, snapshot.pix);
+        pixelStats = pixelArt.stats;
+        issues.push(...pixelArt.issues);
+      }
     } catch {
       notes.push("Could not capture/analyze a screenshot.");
     }
@@ -100,6 +107,8 @@ export async function validateScene(args: ValidateArgs): Promise<ValidateResult>
         multi_view_capable: snapshot.deep || snapshot.hasSetView,
       },
       image: stats,
+      pixel_art: pixelStats,
+      mode: snapshot.mode,
       scene_stats: sceneStats,
       issues: sorted,
       notes,

@@ -1,6 +1,6 @@
-# Workflow: building 3D canvas scenes with this server
+# Workflow: building canvas scenes with this server
 
-You write a **self-contained HTML file** that renders a 3D scene into a `<canvas>`. This server gives you eyes (screenshots) and instruments (validation). Use the loop:
+You write a **self-contained HTML file** that renders into a `<canvas>` — 3D (Three.js, raw WebGL, Canvas 2D projection), flat 2D illustration/UI, or pixel art. This server gives you eyes (screenshots) and instruments (validation). Use the loop:
 
 1. **Write** the HTML file with your own file tools (any tech: Three.js, Canvas 2D, raw WebGL).
 2. **`render_scene`** — look hard at EVERY angle. Does the silhouette read? Are parts floating, misplaced, out of proportion?
@@ -28,6 +28,8 @@ Never declare a scene done without at least one render + one validate.
   };
   ```
   (`C3D` scenes and `GLH.registerView()` do this automatically.)
+- **Flat 2D scenes (illustration, UI, pixel art)**: set `window.__mode = "2d"` so the server captures a single view instead of asking for camera hooks (`D2D` and `PIX` do this automatically). Pixel art: `PIX` also registers `window.__pix` which unlocks pixel-art validation (anti-aliasing & palette checks).
+- **Animations**: call `render_scene` with `animation_frames: 4, frame_interval_ms: 150` to capture sequential frames instead of camera views.
 - **Async setup?** Expose `window.__ready = somePromise` and the server waits for it.
 - **Render-once WebGL scenes** can screenshot blank (the drawing buffer is discarded after presentation). Either animate with `requestAnimationFrame` or expose `window.__redraw = () => draw()`.
 
@@ -39,6 +41,8 @@ Never declare a scene done without at least one render + one validate.
 | `<script src="/__helpers/canvas3d.js">` | `C3D` — software-3D engine for Canvas 2D: primitives, chainable API, orbit camera, flat shading |
 | `<script src="/__helpers/webgl-helpers.js">` | `GLH` — shader compile, default shaders, mesh generators, `mat4`, `orbitCamera`, `texture`, `registerView` |
 | `<script src="/__helpers/texture-helpers.js">` | `TEX` — procedural textures: `noise wood brick marble checker stripes gradient dots grid bump` |
+| `<script src="/__helpers/draw2d.js">` | `D2D` — flat 2D: layers, shapes, gradients/shadows, game UI (panel, healthBar, button), animation ticker |
+| `<script src="/__helpers/pixel-helpers.js">` | `PIX` — pixel art: logical grid + crisp scaling, retro palettes, Bresenham primitives, dither, mirror, outline, sprites, frame animation |
 
 Three.js itself comes from a CDN importmap (network required):
 
@@ -56,4 +60,4 @@ Three.js itself comes from a CDN importmap (network required):
 
 ## Other guideline topics
 
-`get_guidelines` topics: `general` (modeling craft), `texturing`, `threejs`, `canvas2d`, `webgl`, `helpers` (API source).
+`get_guidelines` topics: `general` (3D modeling craft), `texturing`, `threejs`, `canvas2d`, `webgl`, `art2d` (flat illustration + game UI), `pixelart`, `helpers` (API source).

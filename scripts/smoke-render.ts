@@ -8,9 +8,13 @@ const file = process.argv[2] ?? path.resolve("examples/good-threejs-robot.html")
 const outDir = path.resolve("scripts/.smoke-out");
 mkdirSync(outDir, { recursive: true });
 
+const frames = Number(process.argv[3] ?? 1);
+
 const result = await renderScene({
   file_path: file,
   views: ["front", "three-quarter", "side", "top"],
+  animation_frames: frames,
+  frame_interval_ms: 250,
   format: "jpeg",
   width: 800,
   height: 600,

@@ -1,13 +1,13 @@
 # canvas3d-mcp
 
-Servidor MCP que dá a agentes de IA **olhos e instrumentos** para criar modelos 3D melhores em `<canvas>` HTML — qualquer tecnologia: Three.js, WebGL puro ou Canvas 2D (projeção por software).
+Servidor MCP que dá a agentes de IA **olhos e instrumentos** para criar arte em `<canvas>` HTML melhor: modelos 3D (Three.js, WebGL puro, Canvas 2D por software), ilustração 2D, UI de jogos e **pixel art**.
 
 A IA escreve um arquivo HTML auto-contido; o servidor renderiza em Chromium headless e devolve:
 
-- **`render_scene`** — screenshots multi-ângulo (front/side/top/three-quarter ou ângulos custom, com close-up via `distance_factor < 1`). A IA passa a *ver* o que criou e itera.
-- **`validate_scene`** — relatório JSON estruturado: erros de página/console, canvas em branco, e (com Three.js registrado) checks profundos do grafo de cena: objetos flutuando, sem luzes, fora do frustum, transform NaN, texturas sem UV, clipping de câmera etc. Cada issue vem com severidade e sugestão de correção.
+- **`render_scene`** — screenshots multi-ângulo (front/side/top/three-quarter ou ângulos custom, close-up via `distance_factor < 1`) ou **frames sequenciais de animação** (`animation_frames` + `frame_interval_ms`). A IA passa a *ver* o que criou e itera.
+- **`validate_scene`** — relatório JSON estruturado: erros de página/console, canvas em branco, e (com Three.js registrado) checks profundos do grafo de cena: objetos flutuando, sem luzes, fora do frustum, transform NaN, texturas sem UV, clipping de câmera etc. Para pixel art (`window.__pix`): `ANTI_ALIASING` (pixels borrados/fora da grade) e `PALETTE_OVERFLOW`. Cada issue vem com severidade e sugestão de correção.
 - **`inspect_scene`** — dump da árvore de cena Three.js com bounding boxes em coordenadas de mundo, para raciocinar sobre posicionamento exato.
-- **`get_guidelines`** — guias de modelagem (workflow, ofício geral, texturização, armadilhas por tecnologia).
+- **`get_guidelines`** — guias (workflow, ofício 3D geral, texturização, armadilhas por tecnologia, ilustração 2D + UI de jogos, pixel art).
 
 Bibliotecas de helpers servidas em `/__helpers/` para o HTML da IA:
 
@@ -17,6 +17,8 @@ Bibliotecas de helpers servidas em `/__helpers/` para o HTML da IA:
 | `canvas3d.js` | Canvas 2D | mini-engine 3D por software (`C3D`): primitivas, câmera orbital, flat shading |
 | `webgl-helpers.js` | WebGL puro | `GLH`: shaders prontos, malhas com UVs, `mat4`, `orbitCamera`, upload de texturas |
 | `texture-helpers.js` | todas | `TEX`: texturas procedurais (wood, brick, marble, noise, bump...) sem rede |
+| `draw2d.js` | ilustração 2D / UI | `D2D`: camadas com transform, formas/gradientes/sombras, UI de jogos (panel, healthBar, button), ticker de animação |
+| `pixel-helpers.js` | pixel art | `PIX`: grade lógica exibida nítida, paletas retrô (Game Boy, PICO-8, NES...), Bresenham, flood fill, dithering, espelhamento, outline, sprites, animação por frames |
 
 ## Setup
 

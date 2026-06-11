@@ -111,6 +111,8 @@ export async function withScene<T>(
           canvases: [],
           contextCreationErrors: [],
           contextLost: false,
+          mode: null,
+          pix: null,
         } satisfies ProbeSnapshot;
       }
     };

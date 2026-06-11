@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /><title>Night valley — 2D illustration (D2D) example</title><style>body{margin:0}</style></head>
+<body>
+  <canvas id="c" width="800" height="600"></canvas>
+  <script src="/__helpers/draw2d.js"></script>
+  <script>
+    const d = D2D.scene(document.getElementById("c"), { background: "#0b1030" });
+
+    // sky band with gradient + stars + moon
+    const sky = d.layer();
+    sky.rect({ x: 0, y: 0, w: 800, h: 600, fill: D2D.linear(0, 0, 0, 600, [[0, "#070b22"], [0.6, "#2a2150"], [1, "#4a3162"]]) });
+    for (let i = 0; i < 40; i++) {
+      const sx = (i * 137) % 800;
+      const sy = ((i * 89) % 300) + 10;
+      sky.circle({ cx: sx, cy: sy, r: i % 7 === 0 ? 1.6 : 0.9, fill: "#e8ecff", alpha: 0.5 + (i % 5) * 0.1 });
+    }
+    sky.circle({ cx: 640, cy: 120, r: 44, fill: "#f5edc8", shadow: { color: "#f5edc8", blur: 60 } });
+    sky.circle({ cx: 655, cy: 110, r: 40, fill: "#0b1030", alpha: 0.25 }); // crescent bite
+
+    // far mountains (lighter, low contrast = atmospheric depth)
+    const far = d.layer();
+    far.curve([[0, 430], [120, 330], [260, 410], [420, 310], [580, 420], [700, 350], [800, 410], [800, 600], [0, 600]], { fill: "#3a3560", close: true });
+
+    // near hills
+    const near = d.layer();
+    near.curve([[0, 520], [180, 430], [380, 510], [560, 440], [800, 520], [800, 600], [0, 600]], { fill: "#221d40", close: true });
+
+    // cottage on the near hill
+    const fg = d.layer();
+    fg.rect({ x: 340, y: 430, w: 90, h: 60, fill: "#171228" });
+    fg.poly([[330, 432], [385, 395], [440, 432]], { fill: "#0f0b1e" });
+    fg.rect({ x: 372, y: 455, w: 22, h: 35, fill: "#ffd989", shadow: { color: "#ffc861", blur: 24 } }); // lit door
+    fg.rect({ x: 348, y: 442, w: 14, h: 14, fill: "#ffd989", shadow: { color: "#ffc861", blur: 16 } }); // window
+    // chimney + smoke
+    fg.rect({ x: 418, y: 402, w: 10, h: 26, fill: "#171228" });
+    fg.circle({ cx: 425, cy: 392, r: 6, fill: "#9a93b5", alpha: 0.5 });
+    fg.circle({ cx: 432, cy: 378, r: 8, fill: "#9a93b5", alpha: 0.35 });
+    fg.circle({ cx: 441, cy: 360, r: 11, fill: "#9a93b5", alpha: 0.2 });
+
+    // vignette
+    const fx = d.layer();
+    fx.rect({ x: 0, y: 0, w: 800, h: 600, fill: D2D.radial(400, 300, 240, 560, [[0, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,0.45)"]]) });
+
+    // HUD demo
+    const hud = d.layer();
+    D2D.ui.panel(hud, { x: 16, y: 16, w: 250, h: 78 });
+    D2D.ui.healthBar(hud, { x: 32, y: 34, w: 218, h: 16, value: 0.72, label: "HP 72/100" });
+    D2D.ui.button(hud, { x: 32, y: 58, w: 100, h: 26, label: "EXPLORE" });
+
+    d.render();
+  </script>
+</body>
+</html>

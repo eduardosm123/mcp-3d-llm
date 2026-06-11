@@ -38,7 +38,11 @@ const viewSchema = z.union([
 export const renderSceneShape = {
   file_path: z.string().describe("Absolute path to a self-contained .html file that renders a 3D scene into a <canvas>"),
   views: z.array(viewSchema).min(1).max(8).default(["front", "three-quarter", "side", "top"])
-    .describe("Camera views to capture (requires window.__scene or window.__setView; see get_guidelines topic 'workflow')"),
+    .describe("Camera views to capture (requires window.__scene or window.__setView; see get_guidelines topic 'workflow'). Ignored for 2D scenes and when animation_frames > 1."),
+  animation_frames: z.number().int().min(1).max(16).default(1)
+    .describe("Capture N sequential frames of an animated scene instead of multiple camera views"),
+  frame_interval_ms: z.number().int().min(16).max(5000).default(150)
+    .describe("Delay between animation frame captures"),
   format: z.enum(["jpeg", "png"]).default("jpeg"),
   ...renderOptionsShape,
 };
@@ -51,6 +55,8 @@ function normalizeViews(views: Array<ViewSpec | "side">): ViewSpec[] {
 export interface RenderArgs {
   file_path: string;
   views: Array<ViewSpec | "side">;
+  animation_frames: number;
+  frame_interval_ms: number;
   format: "jpeg" | "png";
   width: number;
   height: number;
@@ -87,7 +93,24 @@ export async function renderScene(args: RenderArgs): Promise<RenderResult> {
     const images: CapturedView[] = [];
     let viewMode: string;
 
-    if (snapshot.deep) {
+    if (args.animation_frames > 1) {
+      viewMode = `animation frames (every ${args.frame_interval_ms}ms)`;
+      for (let i = 1; i <= args.animation_frames; i++) {
+        if (i > 1) await session.page.waitForTimeout(args.frame_interval_ms);
+        const shot = await captureCanvas(session, opts);
+        images.push({ name: `frame-${i}`, ...shot });
+      }
+      if (!snapshot.rafTicked) {
+        notes.push(
+          "animation_frames requested but the page never used requestAnimationFrame — all frames are likely identical."
+        );
+      }
+    } else if (snapshot.mode === "2d") {
+      viewMode = "2d (single view)";
+      await session.page.evaluate(callInjected("redraw.js")).catch(() => {});
+      const shot = await captureCanvas(session, opts);
+      images.push({ name: "default", ...shot });
+    } else if (snapshot.deep) {
       viewMode = "auto-orbit (window.__scene)";
       for (const view of views) {
         const result = (await session.page
@@ -157,6 +180,8 @@ export async function renderScene(args: RenderArgs): Promise<RenderResult> {
 
     const meta = {
       engine: snapshot.engine,
+      mode: snapshot.mode,
+      pixel_art: snapshot.pix,
       view_mode: viewMode,
       views_captured: images.map((i) => i.name),
       canvas_found: snapshot.canvases.length > 0,
