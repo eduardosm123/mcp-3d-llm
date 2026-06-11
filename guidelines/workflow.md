@@ -7,8 +7,11 @@ You write a **self-contained HTML file** that renders into a `<canvas>` — 3D (
 3. **`validate_scene`** — fix `error` issues first, then `warning`. `info` items are suggestions.
 4. **Fix the worst problem first**, re-render, repeat. Stop when both the images look right *and* validation passes.
 5. For placement questions ("where exactly is the arm?"), use **`inspect_scene`** (Three.js only).
+6. For **games**, also use **`interact_scene`**: script inputs (keys/clicks/waits) with screenshots and `read_state` to verify the gameplay actually works (see get_guidelines topic "gamedev").
 
-Never declare a scene done without at least one render + one validate.
+Never declare a scene done without at least one render + one validate (and a playtest, if it's a game).
+
+**Multi-file is fine**: the entry HTML's whole folder is served, so `<script src="./main.js">` and relative assets work. Helpers stay at the absolute path `/__helpers/...`.
 
 ## Critical conventions (enable multi-angle capture + deep validation)
 
@@ -43,6 +46,8 @@ Never declare a scene done without at least one render + one validate.
 | `<script src="/__helpers/texture-helpers.js">` | `TEX` — procedural textures: `noise wood brick marble checker stripes gradient dots grid bump` |
 | `<script src="/__helpers/draw2d.js">` | `D2D` — flat 2D: layers, shapes, gradients/shadows, game UI (panel, healthBar, button), animation ticker |
 | `<script src="/__helpers/pixel-helpers.js">` | `PIX` — pixel art: logical grid + crisp scaling, retro palettes, Bresenham primitives, dither, mirror, outline, sprites, frame animation |
+| `<script src="/__helpers/game2d.js">` | `G2D` — 2D games: fixed-timestep loop, input, entities, AABB collision, string tilemaps with `moveEntity`, camera follow/shake, tweens, particles |
+| `import * as G3D from "/__helpers/game3d.js"` | `G3D` — 3D games: world bootstrap, character controller (WASD+jump), third-person camera, AABB colliders, raycast pick |
 
 Three.js itself comes from a CDN importmap (network required):
 

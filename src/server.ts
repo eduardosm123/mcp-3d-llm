@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { renderScene, renderSceneShape, type RenderArgs } from "./tools/render.js";
 import { validateScene, validateSceneShape, type ValidateArgs } from "./tools/validate.js";
 import { inspectScene, inspectSceneShape, type InspectArgs } from "./tools/inspect.js";
+import { interactScene, interactSceneShape, type InteractArgs } from "./tools/interact.js";
 import {
   getGuideline,
   guidelinesShape,
@@ -25,11 +26,11 @@ function errorResult(e: unknown): { content: Content[]; isError: true } {
   return { content: [textBlock(message)], isError: true };
 }
 
-const SERVER_INSTRUCTIONS = `canvas3d gives you eyes and instruments for building visual art in HTML <canvas>: 3D scenes (Three.js, raw WebGL, Canvas 2D projection), flat 2D illustration, game UI and pixel art.
+const SERVER_INSTRUCTIONS = `canvas3d gives you eyes and instruments for building visual work in HTML <canvas>: 3D scenes (Three.js, raw WebGL, Canvas 2D projection), flat 2D illustration, game UI, pixel art, and playable 2D/3D games.
 
 How to use it correctly:
-1. Before writing your FIRST scene, call get_guidelines("workflow") — it explains the conventions and helper libraries. For the craft itself use topics: general (3D), texturing, threejs, canvas2d, webgl, art2d, pixelart.
-2. Write a SELF-CONTAINED .html file (your own file tools) that renders into a <canvas>. Include helper libraries via <script src="/__helpers/...js"> — they are served automatically. Key conventions:
+1. Before writing your FIRST scene, call get_guidelines("workflow") — it explains the conventions and helper libraries. For the craft itself use topics: general (3D), texturing, threejs, canvas2d, webgl, art2d, pixelart, gamedev.
+2. Write an .html entry file (your own file tools) that renders into a <canvas>. The file's whole folder is served, so multi-file games/scenes work (<script src="./main.js">). Include helper libraries via <script src="/__helpers/...js"> — they are served automatically. Key conventions:
    - Three.js: register window.__scene = {scene, camera, renderer} (or threeHelpers register()) — unlocks multi-angle capture and deep validation.
    - Other 3D tech: implement window.__setView({azimuth_deg, elevation_deg, distance_factor}).
    - Flat 2D / pixel art: the D2D/PIX helpers set window.__mode = "2d" and window.__pix for you.
@@ -37,6 +38,7 @@ How to use it correctly:
 4. validate_scene(file_path) — fix every "error" issue, then "warning"; "info" is advice. Each issue includes a concrete suggestion.
 5. Iterate (edit -> render -> validate) until BOTH the images look right AND validation passes. Never declare a scene done without at least one render and one validate.
 6. inspect_scene(file_path) (Three.js only) when you need exact world positions/sizes to fix placement.
+7. GAMES: use the G2D/G3D helper libs (game loop, input, collision, character controller) and PLAYTEST with interact_scene — script key presses/clicks/waits with screenshots and read_state between them. Expose window.__state = () => ({score, player...}) and assert it changes. A game that renders is not a game that plays.
 
 The server only observes — it never edits your files.`;
 
@@ -95,6 +97,36 @@ export function createServer(): McpServer {
             type: "image",
             data: result.screenshot.buffer.toString("base64"),
             mimeType: "image/png",
+          });
+        }
+        return { content };
+      } catch (e) {
+        return errorResult(e);
+      }
+    }
+  );
+
+  server.registerTool(
+    "interact_scene",
+    {
+      title: "Playtest a game: send inputs and watch what happens",
+      description:
+        "Loads a game HTML file and executes a script of inputs (key presses/holds, clicks, waits) interleaved with " +
+        "screenshots and state reads, so you can VERIFY the gameplay you wrote actually works: does the player move, " +
+        "jump, collide, score? Games should expose window.__state = () => ({...}) for read_state assertions. " +
+        "Always playtest after building or changing game mechanics — a game that renders is not a game that plays.",
+      inputSchema: interactSceneShape,
+    },
+    async (args) => {
+      try {
+        const result = await interactScene(args as InteractArgs);
+        const content: Content[] = [textBlock(result.meta)];
+        for (const shot of result.shots) {
+          content.push(textBlock(`screenshot: ${shot.label}`));
+          content.push({
+            type: "image",
+            data: shot.buffer.toString("base64"),
+            mimeType: result.format === "jpeg" ? "image/jpeg" : "image/png",
           });
         }
         return { content };

@@ -16,6 +16,7 @@ export const GUIDELINE_TOPICS = [
   "webgl",
   "art2d",
   "pixelart",
+  "gamedev",
   "helpers",
 ] as const;
 export type GuidelineTopic = (typeof GUIDELINE_TOPICS)[number];
@@ -25,6 +26,7 @@ export const guidelinesShape = {
     "workflow = the write→render→validate loop and server conventions (START HERE); general = 3D modeling craft; " +
       "texturing = procedural textures/UVs; threejs/canvas2d/webgl = per-tech 3D pitfalls; " +
       "art2d = flat 2D illustration + game UI/HUD; pixelart = pixel-art craft, palettes and animation; " +
+      "gamedev = 2D/3D games: game loop, input, collision, playtesting with interact_scene, multi-file structure; " +
       "helpers = helper library source code"
   ),
 };
@@ -36,6 +38,8 @@ export const HELPER_FILES = [
   "texture-helpers.js",
   "draw2d.js",
   "pixel-helpers.js",
+  "game2d.js",
+  "game3d.js",
 ] as const;
 
 export function getGuideline(topic: GuidelineTopic): string {
