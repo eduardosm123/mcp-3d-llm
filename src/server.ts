@@ -25,8 +25,23 @@ function errorResult(e: unknown): { content: Content[]; isError: true } {
   return { content: [textBlock(message)], isError: true };
 }
 
+const SERVER_INSTRUCTIONS = `canvas3d gives you eyes and instruments for building visual art in HTML <canvas>: 3D scenes (Three.js, raw WebGL, Canvas 2D projection), flat 2D illustration, game UI and pixel art.
+
+How to use it correctly:
+1. Before writing your FIRST scene, call get_guidelines("workflow") — it explains the conventions and helper libraries. For the craft itself use topics: general (3D), texturing, threejs, canvas2d, webgl, art2d, pixelart.
+2. Write a SELF-CONTAINED .html file (your own file tools) that renders into a <canvas>. Include helper libraries via <script src="/__helpers/...js"> — they are served automatically. Key conventions:
+   - Three.js: register window.__scene = {scene, camera, renderer} (or threeHelpers register()) — unlocks multi-angle capture and deep validation.
+   - Other 3D tech: implement window.__setView({azimuth_deg, elevation_deg, distance_factor}).
+   - Flat 2D / pixel art: the D2D/PIX helpers set window.__mode = "2d" and window.__pix for you.
+3. render_scene(file_path) — LOOK at every returned image carefully (shape, proportions, placement, palette). Use distance_factor < 1 for close-ups; animation_frames > 1 for animations.
+4. validate_scene(file_path) — fix every "error" issue, then "warning"; "info" is advice. Each issue includes a concrete suggestion.
+5. Iterate (edit -> render -> validate) until BOTH the images look right AND validation passes. Never declare a scene done without at least one render and one validate.
+6. inspect_scene(file_path) (Three.js only) when you need exact world positions/sizes to fix placement.
+
+The server only observes — it never edits your files.`;
+
 export function createServer(): McpServer {
-  const server = new McpServer({ name: "canvas3d", version: "0.1.0" });
+  const server = new McpServer({ name: "canvas3d", version: "0.1.0" }, { instructions: SERVER_INSTRUCTIONS });
 
   server.registerTool(
     "render_scene",

@@ -11,6 +11,9 @@ const transport = new StdioClientTransport({
 const client = new Client({ name: "smoke", version: "0.0.1" });
 await client.connect(transport);
 
+const instructions = client.getInstructions();
+console.log("server instructions chars:", instructions?.length ?? 0);
+
 const tools = await client.listTools();
 console.log("tools:", tools.tools.map((t) => t.name).join(", "));
 
