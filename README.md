@@ -37,7 +37,11 @@ npx playwright install chromium
 claude mcp add canvas3d -- npx tsx "C:\Users\use\Desktop\ESTUDO\3d canvas improve\src\index.ts"
 
 # ou disponível em todos os projetos:
-claude mcp add --scope user canvas3d -- npx tsx "C:\Users\use\Desktop\ESTUDO\3d canvas improve\src\index.ts"
+claude mcp add --scope user canvas3d -- npx tsx "$PWD\src\index.ts"
+
+
+# para confirmar
+claude mcp lists
 ```
 
 Depois peça, por exemplo: *"usando as tools do canvas3d, crie um robô 3D em Three.js — leia get_guidelines('workflow') primeiro e itere com render/validate até ficar bom".*
