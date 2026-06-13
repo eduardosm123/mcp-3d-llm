@@ -41,7 +41,7 @@ claude mcp add --scope user canvas3d -- npx tsx "$PWD\src\index.ts"
 
 
 # para confirmar
-claude mcp lists
+claude mcp list
 ```
 
 Depois peça, por exemplo: *"usando as tools do canvas3d, crie um robô 3D em Three.js — leia get_guidelines('workflow') primeiro e itere com render/validate até ficar bom".*
